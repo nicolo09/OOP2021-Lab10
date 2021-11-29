@@ -31,42 +31,49 @@ public final class MusicGroupImpl implements MusicGroup {
 
     @Override
     public Stream<String> orderedSongNames() {
-        return null;
+        return songs.stream().map(Song::getSongName).sorted();
     }
 
     @Override
     public Stream<String> albumNames() {
-        return null;
+        return albums.keySet().stream().sorted();
     }
 
     @Override
     public Stream<String> albumInYear(final int year) {
-        return null;
+        return albums.keySet().stream().filter(a -> albums.get(a) == year);
     }
 
     @Override
     public int countSongs(final String albumName) {
-        return -1;
+        return Math.toIntExact(songs.stream().filter(s -> s.getAlbumName().equals(Optional.of(albumName))).count());
     }
 
     @Override
     public int countSongsInNoAlbum() {
-        return -1;
+        return (int) songs.stream().filter(a -> a.getAlbumName().isEmpty()).count();
     }
 
     @Override
     public OptionalDouble averageDurationOfSongs(final String albumName) {
-        return null;
+        return songs.stream().filter(a -> a.getAlbumName().equals(Optional.of(albumName)))
+                .mapToDouble(a -> a.getDuration()).average();
     }
 
     @Override
     public Optional<String> longestSong() {
-        return null;
+        return Optional
+                .of(songs.stream().max((a, b) -> Double.compare(a.getDuration(), b.getDuration())).get().getSongName());
     }
 
     @Override
     public Optional<String> longestAlbum() {
-        return null;
+        return albums.keySet().stream()
+                .max((albumName1, albumName2) -> Double.compare(
+                        songs.stream().filter(a -> a.getAlbumName().equals(Optional.of(albumName1)))
+                                .mapToDouble(a -> a.getDuration()).sum(),
+                        songs.stream().filter(a -> a.getAlbumName().equals(Optional.of(albumName2)))
+                                .mapToDouble(a -> a.getDuration()).sum()));
     }
 
     private static final class Song {
