@@ -6,7 +6,9 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.Toolkit;
+import java.util.Arrays;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -16,8 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 /**
- * Modify this small program adding new filters.
- * Realize this exercise using as much as possible the Stream library.
+ * Modify this small program adding new filters. Realize this exercise using as
+ * much as possible the Stream library.
  * 
  * 1) Convert to lowercase
  * 
@@ -27,7 +29,8 @@ import javax.swing.JTextArea;
  * 
  * 4) List all the words in alphabetical order
  * 
- * 5) Write the count for each word, e.g. "word word pippo" should output "pippo -> 1 word -> 2"
+ * 5) Write the count for each word, e.g. "word word pippo" should output "pippo
+ * -> 1 word -> 2"
  *
  */
 public final class LambdaFilter extends JFrame {
@@ -35,7 +38,14 @@ public final class LambdaFilter extends JFrame {
     private static final long serialVersionUID = 1760990730218643730L;
 
     private enum Command {
-        IDENTITY("No modifications", Function.identity());
+        IDENTITY("No modifications", Function.identity()),
+        LOWERCASE("To lowercase", a -> a.toLowerCase()),
+        COUNTCHARS("Characters count", a -> Integer.toString(a.length())),
+        COUNTLINES("Lines count", a -> Long.toString(a.lines().count())),
+        ALPHABETICAL("Alphabetical order",
+                a -> Arrays.stream(a.split(" ")).sorted((i, j) -> i.compareTo(j)).collect(Collectors.joining(", "))),
+        COUNTWORDS("Count for each word", a -> Arrays.stream(a.split(" ")).map(b -> b.concat(" -> " + b.length()))
+                .collect(Collectors.joining(System.lineSeparator())));
 
         private final String commandName;
         private final Function<String, String> fun;
